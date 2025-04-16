@@ -29,12 +29,8 @@ function sanitizeHeaders(headers) {
   return sanitized;
 }
 
-app.get('/', (req, res) => {
-    res.send('Welcome to the HTTP Proxy Server! Use /execute-request to make requests.');
-});
-
-// Execute request endpoint
-app.post('/execute-request', async (req, res) => {
+// Common function to handle request execution
+async function executeRequest(req, res) {
   const requestId = randomUUID();
   const startTime = Date.now();
 
@@ -165,7 +161,17 @@ app.post('/execute-request', async (req, res) => {
       code: error.code
     });
   }
+}
+
+app.get('/', (req, res) => {
+    res.send('Welcome to the HTTP Proxy Server! Use /execute-request or POST to root endpoint to make requests.');
 });
+
+// Handle POST requests to the root endpoint
+app.post('/', executeRequest);
+
+// Execute request endpoint
+app.post('/execute-request', executeRequest);
 
 // Basic health check endpoint
 app.get('/health', (req, res) => {
